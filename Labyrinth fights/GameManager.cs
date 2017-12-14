@@ -10,6 +10,7 @@ namespace Labyrinth_fights
     {
         private Labyrinthe labyrinthe;
         private List<OtherCase> listeCombattants;
+        private List<OtherCase> listeObjets;
 
         private CombattantFactory combattantFactory;
         private CaseFactory caseFactory;
@@ -22,6 +23,7 @@ namespace Labyrinth_fights
         {
             labyrinthe = new Labyrinthe();
             listeCombattants = new List<OtherCase>();
+            listeObjets = new List<OtherCase>();
             combattantFactory = new CombattantFactory();
             caseFactory = new CaseFactory();
             random = new Random();
@@ -35,7 +37,9 @@ namespace Labyrinth_fights
             creerCombattants();
             AjoutCombattants();
             labyrinthe.displayBoard();
+            creerObjets();
             AjoutObjets();
+            labyrinthe.displayBoard();
 
         }
 
@@ -61,11 +65,11 @@ namespace Labyrinth_fights
         public void creerCombattants()
         {
             //n => number of combattants (1% of the free cases)
-            double n = Math.Round((caseLibre.Capacity) * 0.01);
+            double n = Math.Round((caseLibre.Count) * 0.01);
 
             for (int i = 0; i < n; i++)
             {
-                Combattant combattant = combattantFactory.returnCombattant();
+               // Combattant combattant = combattantFactory.returnCombattant();
                 listeCombattants.Add((OtherCase)caseFactory.returnCase("combattant"));
             }
         }
@@ -97,17 +101,35 @@ namespace Labyrinth_fights
         public void creerObjets()
         {
             //n => number of objets (10% of the free cases)
-            double n = Math.Round((caseLibre.Capacity) * 0.1);
+            double n = Math.Round((caseLibre.Count) * 0.1);
 
             for (int i = 0; i < n; i++)
             {
-                OtherCase objet = combattantFactory.returnCombattant();
-                listeCombattants.Add((OtherCase)caseFactory.returnCase("combattant"));
+ 
+                listeObjets.Add((OtherCase)caseFactory.returnCase("objet"));
             }
         }
         public void AjoutObjets()
         {
-            int r = random.Next(0, caseLibre.Count);
+            for (int i = 0; i < listeObjets.Count; i++)
+            {
+                //nouveau random sur les cases libres
+                int r = random.Next(0, caseLibre.Count);
+
+                int n1 = caseLibre[r][0]; //x
+                int n2 = caseLibre[r][1]; //y
+
+                //change the position of the combattant (in the list)
+                listeObjets[i].PositionX = n1;
+                listeObjets[i].PositionY = n2;
+
+                //we place the combattant on the board
+                labyrinthe.Board[n1, n2] = listeObjets[i];
+
+                //update the free cases
+                EnregistrementCaseLibre();
+                r = 0;
+            }
         }
     }
 }

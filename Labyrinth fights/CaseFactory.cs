@@ -24,7 +24,7 @@ namespace Labyrinth_fights
             }
             else if (type is "sortie")
             {
-                return new Sortie(false, "@");
+                return new Sortie(false, " ");
             }
             else if (type is "libre")
             {
