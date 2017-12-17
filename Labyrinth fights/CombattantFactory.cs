@@ -10,16 +10,16 @@ namespace Labyrinth_fights
     {
         public CombattantFactory() { }
 
-        public Combattant returnCombattant()
+        public Combattant returnCombattant(int x, int y)
         {
             Random random = new Random();
             int r = random.Next(0, 2);
 
             //offensif
-            if (r == 1) return new Combattant(true);
+            if (r == 1) return new Combattant(true,x, y);
 
             //defensif (r == 0)
-            else return new Combattant(false);
+            else return new Combattant(false, x, y);
         }
     }
 }

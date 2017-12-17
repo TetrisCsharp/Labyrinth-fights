@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using System.Threading;
 
 namespace Labyrinth_fights
 {
@@ -19,7 +20,6 @@ namespace Labyrinth_fights
 
         public Labyrinthe()
         {
-
             // get the dimensions of the matrix before initialized the temp matrix
             StreamReader file1 = new StreamReader("board.txt");
             string line1;
@@ -59,7 +59,7 @@ namespace Labyrinth_fights
             combattantFactory = new CombattantFactory();
 
             RemplissageBoard();
-            AffichageBoardTemp();
+            //AffichageBoardTemp();
             //displayBoard();
         }
 
@@ -78,23 +78,27 @@ namespace Labyrinth_fights
         // display the board in the console
         public void displayBoard()
         {
-            for (int i = 0; i < dimX; i++)
+            while (true)
             {
-                for (int j = 0; j < dimY; j++)
+                for (int i = 0; i < dimX; i++)
                 {
-                    // si mur ou sortie (classe à part) OU libre
-                    if(board[i,j].GetType() == typeof(Mur) || board[i,j].GetType() == typeof(Sortie) || board[i,j].Element.ToString() == " ")
+                    for (int j = 0; j < dimY; j++)
                     {
-                        Console.Write(board[i, j].Element);
-                        if (j == dimY - 1) Console.Write('\n');
+                        // si mur ou sortie (classe à part) OU libre
+                        if (board[i, j].GetType() == typeof(Mur) || board[i, j].GetType() == typeof(Sortie) || board[i, j].Element.ToString() == " ")
+                        {
+                            Console.Write(board[i, j].Element);
+                            if (j == dimY - 1) Console.Write('\n');
+                        }
+                        else
+                        {
+                            OtherCase oc = (OtherCase)board[i, j];
+                            Console.Write(oc.Element);
+                        }
                     }
-                    else
-                    {
-                        OtherCase oc = (OtherCase)board[i, j];
-                        Console.Write(oc.Element);
-                    }
-                    
                 }
+                Thread.Sleep(200); 
+                Console.SetCursorPosition(0, 0);
             }
         }
 
@@ -109,13 +113,13 @@ namespace Labyrinth_fights
                     switch (temp[i, j])
                     {
                         case "0":
-                            board[i, j] = caseFactory.returnCase("libre");
+                            board[i, j] = caseFactory.returnCase("libre",dimX,dimY);
                             break;
                         case "1":
-                            board[i, j] = caseFactory.returnCase("mur");
+                            board[i, j] = caseFactory.returnCase("mur",dimX,dimY);
                             break;
                         case "2":
-                            board[i, j] = caseFactory.returnCase("sortie");
+                            board[i, j] = caseFactory.returnCase("sortie",dimX,dimY);
                             break;
                         default:
                             break;

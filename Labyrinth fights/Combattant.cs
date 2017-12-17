@@ -13,52 +13,29 @@ namespace Labyrinth_fights
         private Objet objet;
         private bool caractere;
         private Object symbol;
+        private bool[,] boardVisite;
+        private Stack<int[]> stack;
 
-        public Combattant(bool caractere)
+        public Combattant(bool caractere,int x, int y)
         {
+            boardVisite = new bool[x,y];
+            initBoardVisites(x,y);
             pointsDeVie = 100;
             capacite = 10;
             this.caractere = caractere; //defensif
             objet = null;
-            
+            stack = new Stack<int[]>();
         }
 
-        //déplacements
-        private void deplacementGauche()
+        public void initBoardVisites(int x, int y)
         {
-           // if(position[0] -= 1;
-        }
-
-        private void deplacementDroite()
-        {
-            //position[0] += 1;
-        }
-
-        private void deplacementHaut()
-        {
-            //position[1] -= 1;
-        }
-
-        private void deplacementBas()
-        {
-           // position[1] += 1;
-        }
-
-        private void rammasseObjet()
-        {
-            
-        }
-
-        public void changerCapaciteSuivantObjet()
-        {
-            //capacite += objet.valeur;
-        }
-
-        public void comportement()
-        {
-            Random random = new Random();
-            // int n = random.Next()
-            return;
+            for (int i = 0; i < boardVisite.GetLength(0); i++)
+            {
+                for(int j = 0; j < boardVisite.GetLength(1); j++)
+                {
+                    boardVisite[i, j] = false;
+                }
+            }
         }
 
         //propriétés
@@ -72,7 +49,17 @@ namespace Labyrinth_fights
             get { return this.capacite; }
             set { this.capacite = value; }
         }
+        public Stack<int[]> Stack
+        {
+            get { return this.stack; }
+            set { this.stack = value; }
+        }
 
+        public bool[,] BoardVisite
+        {
+            get { return this.boardVisite; }
+            set { this.boardVisite = value; }
+        }
     }
 
 }
