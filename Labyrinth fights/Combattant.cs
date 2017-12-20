@@ -15,6 +15,7 @@ namespace Labyrinth_fights
         private Object symbol;
         private bool[,] boardVisite;
         private Stack<int[]> stack;
+        private ObjetFactory objetFactory;
 
         public Combattant(bool caractere,int x, int y)
         {
@@ -23,7 +24,9 @@ namespace Labyrinth_fights
             pointsDeVie = 100;
             capacite = 10;
             this.caractere = caractere; //defensif
-            objet = null;
+            this.objetFactory = new ObjetFactory();
+            objet = objetFactory.renvoieObjet();
+            objet.Valeur = 0;
             stack = new Stack<int[]>();
         }
 
@@ -37,6 +40,8 @@ namespace Labyrinth_fights
                 }
             }
         }
+
+
 
         //propriétés
         public int PointDeVie
@@ -59,6 +64,12 @@ namespace Labyrinth_fights
         {
             get { return this.boardVisite; }
             set { this.boardVisite = value; }
+        }
+
+        public Objet Objet
+        {
+            get { return this.objet; }
+            set { this.objet = value; }
         }
     }
 

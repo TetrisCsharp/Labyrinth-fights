@@ -25,7 +25,7 @@ namespace Labyrinth_fights
 
         public GameManager()
         {
-            delay = 1000;
+            delay = 200;
             labyrinthe = new Labyrinthe();
             listeCombattants = new List<OtherCase>();
             listeObjets = new List<OtherCase>();
@@ -38,11 +38,11 @@ namespace Labyrinth_fights
             entierBloque = 0;
             directionBloque = false;
             
-            enregistrementCaseLibre();
-            creerCombattants();
-            ajoutCombattants();
-            creerObjets();
-            ajoutObjets();
+            EnregistrementCaseLibre();
+            CreerCombattants();
+            AjoutCombattants();
+            CreerObjets();
+            AjoutObjets();
 
             //init position vistée (position initiale)
 
@@ -62,15 +62,15 @@ namespace Labyrinth_fights
             Console.Clear();
             threadAffichage.Start();
 
-            Thread t1 = new Thread(() => functionCombattant(listeCombattants[0]));
-            Thread t2 = new Thread(() => functionCombattant(listeCombattants[1]));
+            Thread t1 = new Thread(() => FunctionCombattant(listeCombattants[0]));
+            Thread t2 = new Thread(() => FunctionCombattant(listeCombattants[1]));
             t1.Start();
             t2.Start(); 
         }
 
 
         // return the number of free cases
-        public void enregistrementCaseLibre() // OK  
+        private void EnregistrementCaseLibre() // OK  
         {
             //containing the positions (x and y) of the free cases (empty) => if Libre = true
             caseLibre = new List<int[]>();
@@ -89,7 +89,7 @@ namespace Labyrinth_fights
             }
         }
         
-        public void creerCombattants() // OK  
+        private void CreerCombattants() // OK  
         {
             //n => number of combattants (1% of the free cases)
             double n = Math.Round((caseLibre.Count) * 0.01);
@@ -100,7 +100,7 @@ namespace Labyrinth_fights
             }
         }
         
-        public void ajoutCombattants() // OK  
+        private void AjoutCombattants() // OK  
         {
             // pour chaque combattants dans "listeCombattants"
             for(int i = 0; i < listeCombattants.Count; i++)
@@ -119,12 +119,12 @@ namespace Labyrinth_fights
                 labyrinthe.Board[n1, n2] = listeCombattants[i];
 
                 //update the list of "cases libres" ////////////////
-                enregistrementCaseLibre();
+                EnregistrementCaseLibre();
 
             }
         }
 
-        public void creerObjets() // OK  
+        private void CreerObjets() // OK  
         {
             //n => number of objets (10% of the free cases)
             double n = Math.Round((caseLibre.Count) * 0.1);
@@ -136,9 +136,9 @@ namespace Labyrinth_fights
             }
         }
 
-        public void ajoutObjets() // OK  
+        private void AjoutObjets() // OK  
         {
-            for (int i = 0; i < listeObjets.Count; i++)
+            for(int i = 0; i < listeObjets.Count; i++)
             {
                 //nouveau random sur les cases libres
                 int r = random.Next(0, caseLibre.Count);
@@ -154,131 +154,129 @@ namespace Labyrinth_fights
                 labyrinthe.Board[n1, n2] = listeObjets[i];
 
                 //update the free cases
-                enregistrementCaseLibre();
+                EnregistrementCaseLibre();
             }
         }
 
-
-        /// <summary>
-        //déplacement du combattant
-        /// </summary>
-
-        public void functionCombattant(OtherCase othercase)
+        private void FunctionCombattant(OtherCase othercase)
         {
-            initCombattantListVisitesAndQueue(othercase);
+            //1 seul fois
+            InitCombattantListVisitesAndQueue(othercase);
+            //les positions que l'on va incrémenter à chaque fois
             int x = othercase.PositionX;
             int y = othercase.PositionY;
+            entierBloque = 4;
 
             while (othercase.GetType().ToString() != "Sortie") // while case is not "Sortie" Case
             {
-                int n = decisiondeplacement(othercase);
+                int n = Decisiondeplacement(othercase);
                 
                 // si totalement bloqué => 2 cas : soit impasse => on ne peut que revenir en arriere, soit intersection dans laquelle toutes les possiblites ont été tester (donc visitées)
                 if(n == 4)
                 {
-                    directionBloque = false;
+                    entierBloque = 4;
+                    // revenir sur nos pas tant qu'il n'y a pas de case (non visité, et libre)
+
                     //suppression de othercase (avec combattant dans board de labyrinthe)
-                    supprimerCombattantSurBoard(othercase);
-                    //the the first element of the stack (that corresponds to the last position of the Combattant)
+                    SupprimerCombattantSurBoard(othercase);
+                    //delete the last position in the stack (the current position)
                     Combattant comb = (Combattant)othercase.Content;
                     comb.Stack.Pop();
-                    int [] positions = comb.Stack.Peek();
+                    int[] positions = comb.Stack.Peek();
                     //modify the positions of the othercase
                     othercase.PositionX = positions[0];
                     othercase.PositionY = positions[1];
-                    //ajouter sur board
-                    ajouterCombattantSurBoard(othercase, positions[0], positions[1]);
+                    x = positions[0];
+                    y = positions[1];
+                    //réajouter sur board sur positions précédentes
+                    labyrinthe.Board[othercase.PositionX, othercase.PositionY] = othercase;                   
+                    
                 }
 
                 // si non bloqué => n = 0,1,2,3
                 else
                 {
                     //suppression de othercase (avec combattant dans board de labyrinthe)
-                    supprimerCombattantSurBoard(othercase);
-                    directionBloque = true;
+                    SupprimerCombattantSurBoard(othercase);
+                   
+
                     switch (n)
                     {
                         case 0: // gauche
-                            ajouterCombattantSurBoard(othercase, x, y - 1);
+                            if (VerifCaseContientObjet(x, y - 1))
+                            {
+                                AjouterObjetAuCombattant(othercase, x, y - 1);
+                            }
+                            AjouterCombattantSurBoard(othercase, x, y - 1);
                             entierBloque = 2;
+                            y -= 1;
                             break;
+
                         case 1: // haut
-                            ajouterCombattantSurBoard(othercase, x - 1 , y);
+                            if (VerifCaseContientObjet(x - 1, y))
+                            {
+                                AjouterObjetAuCombattant(othercase, x - 1, y);
+                            }
+                            AjouterCombattantSurBoard(othercase, x - 1 , y);
                             entierBloque = 3;
+                            x -= 1;
                             break;
+
                         case 2: // droite
-                            ajouterCombattantSurBoard(othercase, x, y + 1);
+                            if (VerifCaseContientObjet(x, y + 1))
+                            {
+                                AjouterObjetAuCombattant(othercase, x, y + 1);
+                            }
+                            AjouterCombattantSurBoard(othercase, x, y + 1);
                             entierBloque = 0;
+                            y += 1;
                             break;
+
                         case 3: // bas
-                            ajouterCombattantSurBoard(othercase, x + 1, y);
+                            if (VerifCaseContientObjet(x + 1, y))
+                            {
+                                AjouterObjetAuCombattant(othercase,x +1,y);
+                            }
+                            AjouterCombattantSurBoard(othercase, x + 1, y);
                             entierBloque = 1;
+                            x += 1;
                             break;
+
                         default:
                             break;
                     }
                 }
-                Thread.Sleep(500);
+                Thread.Sleep(delay);
             }
         }
 
-        public int compterCaseVisiteeAutour(OtherCase othercase)
-        {
-            int n = 0;
-            int x = othercase.PositionX;
-            int y = othercase.PositionY;
-
-            Combattant comb = (Combattant)othercase.Content;
-
-             if (comb.BoardVisite[x, y - 1] == true) n++;
-             if (comb.BoardVisite[x, y + 1] == true) n++;
-             if (comb.BoardVisite[x - 1, y] == true) n++;
-             if (comb.BoardVisite[x + 1, y] == true) n++;
-
-            return n;
-        }
-
-        public int compterCasePossible(OtherCase othercase) // OK  
-        {
-            int n = 0;
-            int x = othercase.PositionX;
-            int y = othercase.PositionY;
-
-            if (verifDeplacementBas(x, y)) n++;
-            if (verifDeplacementDroite(x, y)) n++;
-            if (verifDeplacementGauche(x, y)) n++;
-            if (verifDeplacementHaut(x, y)) n++;
-
-            return n;
-        }
-
-        public void ajouterCombattantSurBoard(OtherCase othercase,int newX,int newY)
+        private void AjouterCombattantSurBoard(OtherCase othercase,int newX,int newY)
         {
             //modifcation des positions de othercase
-            modifierPositionOthercase(othercase, newX, newY);
+            ModifierPositionOthercase(othercase, newX, newY);
             //ajouter nouvelle position dans queue
-            ajoutPositionsSurQueue(othercase);
+            AjoutPositionsSurQueue(othercase);
             //ajouter case visitée à true
-            ajoutVisiteHistorique(othercase);
+            AjoutVisiteHistorique(othercase);
             //ajout sur le board du labyrinthe
             labyrinthe.Board[newX, newY] = othercase;
 
         }
 
-        public void modifierPositionOthercase(OtherCase othercase,int newX,int newY)
+        private void ModifierPositionOthercase(OtherCase othercase,int newX,int newY)
         {
             othercase.PositionX = newX;
             othercase.PositionY = newY;
         }
 
-        public void supprimerCombattantSurBoard(OtherCase othercase) // OK  
+        private void SupprimerCombattantSurBoard(OtherCase othercase) // OK  
         {
             int x = othercase.PositionX;
             int y = othercase.PositionY;
             labyrinthe.Board[x, y] = caseFactory.returnCase("libre", x, y);
         }
 
-        public void ajoutVisiteHistorique(OtherCase othercase)// après avoir bouger
+        private void AjoutVisiteHistorique(OtherCase othercase)// après avoir bouger
         {
             int x = othercase.PositionX;
             int y = othercase.PositionY;
@@ -289,7 +287,7 @@ namespace Labyrinth_fights
             comb.BoardVisite[x,y] = true;
         }
 
-        public void ajoutPositionsSurQueue(OtherCase othercase)// après avoir bouger
+        private void AjoutPositionsSurQueue(OtherCase othercase)// après avoir bouger
         {
             int x = othercase.PositionX;
             int y = othercase.PositionY;
@@ -299,7 +297,7 @@ namespace Labyrinth_fights
         }
 
         //l'othercase est déjà placé => récupère la position de othercase, add true (visite), add positions to the stack
-        public void initCombattantListVisitesAndQueue(OtherCase othercase) // OK  
+        private void InitCombattantListVisitesAndQueue(OtherCase othercase) // OK  
         {
             //récupérer la position de othercase
             int x = othercase.PositionX;
@@ -319,56 +317,63 @@ namespace Labyrinth_fights
 
 
         //random choice on the possibilities, return one possiblities (the choice) return a number 0,1,2,or 3
-        private int decisiondeplacement(OtherCase othercase) { // OK  
+        private int Decisiondeplacement(OtherCase othercase) { // OK  
 
-            bool [] tabPossible = deplacementsPossibles(othercase.PositionX, othercase.PositionY);
-            bool [] tabVisite = caseDejaVisite(othercase);
+            bool [] tabPossible = DeplacementsPossibles(othercase.PositionX, othercase.PositionY);
+            bool [] tabVisite = CaseDejaVisite(othercase);
 
             List<int> list = new List<int>();
 
             for(int i = 0; i < tabPossible.Length; i++)
             {
-                if(entierBloque != i && tabPossible[i] && !tabVisite[i]) list.Add(i);////////////////////////////////////
+                if (entierBloque != i && tabPossible[i] && !tabVisite[i])
+                {
+                    list.Add(i);
+                }
             }
             int r = 4; // si la valeur reste à 4 alors bloqué !!!!
-            if(list.Count != 0) r = random.Next(0, list.Count);
+            if (list.Count != 0)
+            {
+                r = random.Next(0, list.Count);
+                return list[r];
+            }
             return r;
         }
 
-        public bool [] caseDejaVisite(OtherCase othercase)
+        private bool [] CaseDejaVisite(OtherCase othercase)
         {
             bool[] tab = { false, false, false, false }; // gauche, haut, droite, bas (pour l'ordre)
 
-            if (verifCaseVisiteGauche(othercase)) tab[0] = true;
-            if (verifCaseVisiteHaut(othercase)) tab[1] = true;
-            if (verifCaseVisiteDroite(othercase)) tab[2] = true;
-            if (verifCaseVisiteBas(othercase)) tab[3]= true;
+            if (VerifCaseVisiteGauche(othercase)) tab[0] = true;
+            if (VerifCaseVisiteHaut(othercase)) tab[1] = true;
+            if (VerifCaseVisiteDroite(othercase)) tab[2] = true;
+            if (VerifCaseVisiteBas(othercase)) tab[3]= true;
 
             return tab;
         }
 
-        public bool verifCaseVisiteGauche(OtherCase othercase)
+        private bool VerifCaseVisiteGauche(OtherCase othercase)
         {
             Combattant combattant = (Combattant)othercase.Content;
             if (combattant.BoardVisite[othercase.PositionX, othercase.PositionY - 1]) return true;
             return false;
         }
 
-        public bool verifCaseVisiteHaut(OtherCase othercase)
+        private bool VerifCaseVisiteHaut(OtherCase othercase)
         {
             Combattant combattant = (Combattant)othercase.Content;
             if (combattant.BoardVisite[othercase.PositionX - 1, othercase.PositionY]) return true;
             return false;
         }
 
-        public bool verifCaseVisiteDroite(OtherCase othercase)
+        private bool VerifCaseVisiteDroite(OtherCase othercase)
         {
             Combattant combattant = (Combattant)othercase.Content;
             if (combattant.BoardVisite[othercase.PositionX, othercase.PositionY + 1]) return true;
             return false;
         }
 
-        public bool verifCaseVisiteBas(OtherCase othercase)
+        private bool VerifCaseVisiteBas(OtherCase othercase)
         {
             Combattant combattant = (Combattant)othercase.Content;
             if (combattant.BoardVisite[othercase.PositionX + 1, othercase.PositionY]) return true;
@@ -376,46 +381,81 @@ namespace Labyrinth_fights
         }
 
         //return an array containing all the possibilities for a case AND for a specific move (block the inversed move)
-        public bool[] deplacementsPossibles(int x, int y) // OK  
+        private bool[] DeplacementsPossibles(int x, int y) // OK  
         {
             bool[] tab = { false, false, false, false }; // gauche, haut, droite, bas (pour l'ordre => 0,1,2,3)
 
-            if (verifDeplacementGauche(x, y)) tab[0] = true;
-            if (verifDeplacementHaut(x, y)) tab[1] = true;
-            if (verifDeplacementDroite(x, y)) tab[2] = true;
-            if (verifDeplacementBas(x, y)) tab[3] = true;
+            if (VerifDeplacementGauche(x, y)) tab[0] = true;
+            if (VerifDeplacementHaut(x, y)) tab[1] = true;
+            if (VerifDeplacementDroite(x, y)) tab[2] = true;
+            if (VerifDeplacementBas(x, y)) tab[3] = true;
 
             return tab;
         }
 
-        //il ne faut pas que la case ai deja été visité !!!!!!!!!!!!!!!!!!!!!!
 
-        /// <summary>
-        /// Déplacements du combattants
-        /// </summary>
-
-        private bool verifDeplacementGauche(int x,int y) // OK  
+        private bool VerifDeplacementGauche(int x,int y) // OK  
         {
-            if (labyrinthe.Board[x, y - 1].Libre) return true;
+            if (labyrinthe.Board[x, y - 1].Libre || VerifCaseContientObjet(x, y - 1)) return true;
             return false;
         }
 
-        private bool verifDeplacementDroite(int x, int y) // OK  
+        private bool VerifDeplacementDroite(int x, int y) // OK  
         {
-            if (labyrinthe.Board[x, y + 1].Libre) return true;
+            if (labyrinthe.Board[x, y + 1].Libre || VerifCaseContientObjet(x, y + 1)) return true;
             return false;
         }
 
-        private bool verifDeplacementHaut(int x, int y) // OK  
+        private bool VerifDeplacementHaut(int x, int y) // OK  
         {
-            if (labyrinthe.Board[x - 1, y].Libre) return true;
+            if (labyrinthe.Board[x - 1, y].Libre || VerifCaseContientObjet(x - 1, y)) return true;
             return false;
         }
 
-        private bool verifDeplacementBas(int x, int y) // OK  
+        private bool VerifDeplacementBas(int x, int y) // OK  
         {
-            if (labyrinthe.Board[x + 1, y].Libre) return true;
+            if (labyrinthe.Board[x + 1, y].Libre || VerifCaseContientObjet(x + 1, y)) return true;
             return false;
+        }
+
+        private bool VerifCaseContientObjet(int x, int y) // case à coté du combattant
+        {
+            if (labyrinthe.Board[x,y] is OtherCase)
+            {
+                OtherCase othr = (OtherCase)labyrinthe.Board[x, y];
+                if (!labyrinthe.Board[x, y].Libre && othr.Content is Objet)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private void AjouterObjetAuCombattant(OtherCase othercase, int x, int y)
+        {
+            OtherCase other = (OtherCase)labyrinthe.Board[x, y];
+            Objet objet = (Objet)other.Content;
+            Combattant combattant = (Combattant)othercase.Content;
+            int val = objet.Valeur + combattant.Objet.Valeur;
+
+            combattant.Objet.Valeur = val;
+        }
+
+        public bool VerifCaseContientEnnemi(OtherCase othercase,int x, int y)
+        {
+
+            OtherCase othr = (OtherCase) labyrinthe.Board[x, y];
+            if (!labyrinthe.Board[x, y].Libre && othr.Content is Combattant)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public void CombattreEnnemi(OtherCase othercase, int x, int y)
+        {
+
         }
     }
 }

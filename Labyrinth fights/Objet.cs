@@ -14,5 +14,11 @@ namespace Labyrinth_fights
         {
             this.valeur = valeur;
         }
+
+        public int Valeur
+        {
+            get { return this.valeur; }
+            set { this.valeur = value; }
+        }
     }
 }

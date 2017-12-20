@@ -18,6 +18,8 @@ namespace Labyrinth_fights
         private CaseFactory caseFactory;
         private CombattantFactory combattantFactory;
 
+        private List<string> actionList;
+
         public Labyrinthe()
         {
             // get the dimensions of the matrix before initialized the temp matrix
@@ -61,6 +63,7 @@ namespace Labyrinth_fights
             RemplissageBoard();
             //AffichageBoardTemp();
             //displayBoard();
+            actionList = new List<string>();
         }
 
         //display the temp board (only used for the test)

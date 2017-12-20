@@ -34,7 +34,7 @@ namespace Labyrinth_fights
             {
                 return new OtherCase(false, "$", objetFactory.renvoieObjet());
             }
-            else return new OtherCase(false, "X", combattantFactory.returnCombattant(x,y));
+            else return new OtherCase(false, "O", combattantFactory.returnCombattant(x,y));
         }
     }
     
