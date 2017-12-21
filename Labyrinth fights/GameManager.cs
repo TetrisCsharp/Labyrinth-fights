@@ -15,17 +15,18 @@ namespace Labyrinth_fights
         private CombattantFactory combattantFactory;
         private CaseFactory caseFactory;
         private Thread threadAffichage;
+        private Thread threadViesCombattant;
         private Random random;
         private int delay;
         private List<int[]> caseLibre;
-        private Thread[] threadCombattant;
+        private Thread[] threaddeplacementCombattant;
 
         private bool directionBloque;
         private int entierBloque;
 
         public GameManager()
         {
-            delay = 200;
+            delay = 500;
             labyrinthe = new Labyrinthe();
             listeCombattants = new List<OtherCase>();
             listeObjets = new List<OtherCase>();
@@ -34,17 +35,13 @@ namespace Labyrinth_fights
             caseFactory = new CaseFactory();
 
             random = new Random();
-            threadAffichage = new Thread(labyrinthe.displayBoard);
+            threadAffichage = new Thread(()=>labyrinthe.displayBoard(delay,true));
             entierBloque = 0;
             directionBloque = false;
             
-            EnregistrementCaseLibre();
-            CreerCombattants();
-            AjoutCombattants();
-            CreerObjets();
-            AjoutObjets();
+            InitBoard();
 
-            //init position vistée (position initiale)
+            threadViesCombattant = new Thread(()=>VieCombattants(listeCombattants));
 
             /*
             //create thread for each combattant
@@ -61,11 +58,37 @@ namespace Labyrinth_fights
             Console.ReadLine();
             Console.Clear();
             threadAffichage.Start();
+            Thread threadAffichageStack = new Thread(AjouterStackActionList);
+            threadAffichageStack.Start();
 
             Thread t1 = new Thread(() => FunctionCombattant(listeCombattants[0]));
             Thread t2 = new Thread(() => FunctionCombattant(listeCombattants[1]));
+
             t1.Start();
             t2.Start(); 
+        }
+
+        private void VieCombattants(List<OtherCase> listCombattants)
+        {
+            while (true) { }
+
+        }
+        private void AjouterStackActionList()
+        {
+            while (true)
+            {
+                OtherCase othr = listeCombattants[1];
+                Combattant comb = (Combattant) othr.Content;
+                labyrinthe.ActionList = comb.Stack;
+            }
+        }
+        private void InitBoard()
+        {
+            EnregistrementCaseLibre();
+            CreerCombattants();
+            AjoutCombattants();
+            CreerObjets();
+            AjoutObjets();
         }
 
 
@@ -96,7 +119,7 @@ namespace Labyrinth_fights
 
             for (int i = 0; i < n; i++)
             {
-                listeCombattants.Add((OtherCase)caseFactory.returnCase("combattant",labyrinthe.DimX,labyrinthe.DimY));
+                listeCombattants.Add((OtherCase)caseFactory.returnCase("combattant",labyrinthe.DimX,labyrinthe.DimY,labyrinthe));
             }
         }
         
@@ -132,7 +155,7 @@ namespace Labyrinth_fights
             for (int i = 0; i < n; i++)
             {
                 // cast to Otherclase because objects from objet class inherits from the Othercase class
-                listeObjets.Add((OtherCase)caseFactory.returnCase("objet",labyrinthe.Board.GetLength(0),labyrinthe.Board.GetLength(1)));
+                listeObjets.Add((OtherCase)caseFactory.returnCase("objet",labyrinthe.Board.GetLength(0),labyrinthe.Board.GetLength(1),labyrinthe));
             }
         }
 
@@ -165,32 +188,56 @@ namespace Labyrinth_fights
             //les positions que l'on va incrémenter à chaque fois
             int x = othercase.PositionX;
             int y = othercase.PositionY;
-            entierBloque = 4;
+            entierBloque = -1;
 
             while (othercase.GetType().ToString() != "Sortie") // while case is not "Sortie" Case
             {
                 int n = Decisiondeplacement(othercase);
-                
+
+                // l'idée c'est que si l'on se retrouve au bout de l'impasse on est dans le cas n = 4, on va ensuite reculer (sauf que maintenant n n'est plus egal à 4, on utilise alors entierBloque
+                // tant que entierBloque = 4, on recule (stack.pop). La condition de sortie (entierbloque = -1) est appliquer lorsque le nombre de case non visité est > 1.
+
+
                 // si totalement bloqué => 2 cas : soit impasse => on ne peut que revenir en arriere, soit intersection dans laquelle toutes les possiblites ont été tester (donc visitées)
-                if(n == 4)
+                if (n == 4 || entierBloque == 4)
                 {
                     entierBloque = 4;
                     // revenir sur nos pas tant qu'il n'y a pas de case (non visité, et libre)
-
-                    //suppression de othercase (avec combattant dans board de labyrinthe)
-                    SupprimerCombattantSurBoard(othercase);
-                    //delete the last position in the stack (the current position)
+                    //vérification   des cases non visitées
+                    bool[] tab = CaseDejaVisite(othercase);
+                    int l = 0;
+                    foreach (bool item in tab)
+                    {
+                        if (!item) l++;
+                    }
                     Combattant comb = (Combattant)othercase.Content;
-                    comb.Stack.Pop();
-                    int[] positions = comb.Stack.Peek();
-                    //modify the positions of the othercase
-                    othercase.PositionX = positions[0];
-                    othercase.PositionY = positions[1];
-                    x = positions[0];
-                    y = positions[1];
-                    //réajouter sur board sur positions précédentes
-                    labyrinthe.Board[othercase.PositionX, othercase.PositionY] = othercase;                   
-                    
+                    if (l < 1)
+                    {
+                        entierBloque = 4; // on change entier bloque
+
+                        //suppression de othercase (avec combattant dans board de labyrinthe)
+                        SupprimerCombattantSurBoard(othercase);
+                        //delete the last position in the stack (the current position)
+                        comb.Stack.Pop();
+                        int[] positions = comb.Stack.Peek();
+                        //modify the positions of the othercase
+                        othercase.PositionX = positions[0];
+                        othercase.PositionY = positions[1];
+                        x = positions[0];
+                        y = positions[1];
+
+                        //réajouter sur board sur positions précédentes
+                        labyrinthe.Board[othercase.PositionX, othercase.PositionY] = othercase;
+
+                    }
+
+                    else entierBloque = -1;
+
+                    if (comb.Stack.Count == 0) entierBloque = -1;
+
+
+                    n = Decisiondeplacement(othercase);
+
                 }
 
                 // si non bloqué => n = 0,1,2,3
@@ -207,6 +254,15 @@ namespace Labyrinth_fights
                             {
                                 AjouterObjetAuCombattant(othercase, x, y - 1);
                             }
+                            if (VerifCaseContientEnnemi(othercase, x, y - 1))
+                            {
+                                
+                                //tant que un des 2 ennemis n'est pas mort (cad que othercase du combattant ou othercase d combattant ennemi existe)
+                                //combattre
+                                //thread de mort ....
+
+                                CombattreEnnemi(othercase, x, y - 1);
+                            }
                             AjouterCombattantSurBoard(othercase, x, y - 1);
                             entierBloque = 2;
                             y -= 1;
@@ -216,6 +272,10 @@ namespace Labyrinth_fights
                             if (VerifCaseContientObjet(x - 1, y))
                             {
                                 AjouterObjetAuCombattant(othercase, x - 1, y);
+                            }
+                            if (VerifCaseContientEnnemi(othercase, x - 1, y))
+                            {
+                                CombattreEnnemi(othercase, x - 1, y);
                             }
                             AjouterCombattantSurBoard(othercase, x - 1 , y);
                             entierBloque = 3;
@@ -227,6 +287,11 @@ namespace Labyrinth_fights
                             {
                                 AjouterObjetAuCombattant(othercase, x, y + 1);
                             }
+
+                            if (VerifCaseContientEnnemi(othercase, x, y + 1))
+                            {
+                                CombattreEnnemi(othercase, x, y + 1);
+                            }
                             AjouterCombattantSurBoard(othercase, x, y + 1);
                             entierBloque = 0;
                             y += 1;
@@ -236,6 +301,10 @@ namespace Labyrinth_fights
                             if (VerifCaseContientObjet(x + 1, y))
                             {
                                 AjouterObjetAuCombattant(othercase,x +1,y);
+                            }
+                            if (VerifCaseContientEnnemi(othercase, x + 1, y))
+                            {
+                                CombattreEnnemi(othercase, x + 1, y);
                             }
                             AjouterCombattantSurBoard(othercase, x + 1, y);
                             entierBloque = 1;
@@ -249,6 +318,8 @@ namespace Labyrinth_fights
                 Thread.Sleep(delay);
             }
         }
+
+
 
         private void AjouterCombattantSurBoard(OtherCase othercase,int newX,int newY)
         {
@@ -273,7 +344,7 @@ namespace Labyrinth_fights
         {
             int x = othercase.PositionX;
             int y = othercase.PositionY;
-            labyrinthe.Board[x, y] = caseFactory.returnCase("libre", x, y);
+            labyrinthe.Board[x, y] = caseFactory.returnCase("libre", x, y,labyrinthe);
         }
 
         private void AjoutVisiteHistorique(OtherCase othercase)// après avoir bouger
@@ -311,9 +382,6 @@ namespace Labyrinth_fights
             int[] tab2 = { x, y };
             comb.Stack.Push(tab2);
         }
-
-
-
 
 
         //random choice on the possibilities, return one possiblities (the choice) return a number 0,1,2,or 3
@@ -455,7 +523,13 @@ namespace Labyrinth_fights
 
         public void CombattreEnnemi(OtherCase othercase, int x, int y)
         {
+            OtherCase othercasecombattant = (OtherCase) labyrinthe.Board[x, y];
+            Combattant combattantennemi = (Combattant) othercasecombattant.Content;
 
+            Combattant moncombattant = (Combattant) othercase.Content;
+
+            //"moncombattant" attaque "combattantennemi"
+            combattantennemi.PointDeVie -= moncombattant.Objet.Valeur;
         }
     }
 }

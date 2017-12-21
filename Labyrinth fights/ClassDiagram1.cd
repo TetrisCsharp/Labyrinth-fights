@@ -1,84 +1,84 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
-  <Class Name="Labyrinth_fights.Case">
-    <Position X="2.75" Y="0.5" Width="1.5" />
+  <Class Name="Labyrinth_fights.Case" Collapsed="true">
+    <Position X="3.75" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAACAAAAAAEAAAABAAgAAAAIAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Case.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Labyrinth_fights.CaseFactory" Collapsed="true">
-    <Position X="16.25" Y="1.75" Width="1.5" />
+    <Position X="9.5" Y="0.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>CAAgBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>CAAgBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAA=</HashCode>
       <FileName>CaseFactory.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Labyrinth_fights.Combattant">
-    <Position X="11.5" Y="2.75" Width="1.5" />
+  <Class Name="Labyrinth_fights.Combattant" Collapsed="true">
+    <Position X="11.25" Y="0.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAIAAAAAAAAIAAgAAAAIAAAgAAIQIAAAQgAAAEAEAA=</HashCode>
+      <HashCode>AAAoAAAAAAAAIAAgAAAAIABAgAAIQIAAAQgAAAEAEAA=</HashCode>
       <FileName>Combattant.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Labyrinth_fights.CombattantFactory" Collapsed="true">
-    <Position X="11" Y="0.5" Width="1.5" />
+    <Position X="13" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAA=</HashCode>
       <FileName>CombattantFactory.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Labyrinth_fights.GameManager">
-    <Position X="7.5" Y="0.5" Width="1.5" />
+    <Position X="9.5" Y="1.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAIAhAACAAAIgEEBoIAAAAhASQiAAQQkIgYLSAAAADg=</HashCode>
+      <HashCode>IIIBDAAAAAAOAIAAIIBjAkkFDQ0CQAAggCQACADAgCk=</HashCode>
       <FileName>GameManager.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Labyrinth_fights.Labyrinthe">
-    <Position X="9.5" Y="1" Width="1.5" />
+  <Class Name="Labyrinth_fights.Labyrinthe" Collapsed="true">
+    <Position X="11.25" Y="1.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAABAAAMACIAAAAAAAAAAAAAAAAAACAIAAwACQAAIA=</HashCode>
+      <HashCode>AAAABAAAMACICAAAAAAAAAAAAAAACACAIAAwACQAAIA=</HashCode>
       <FileName>Labyrinthe.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Labyrinth_fights.Mur">
-    <Position X="2.75" Y="4.75" Width="1.5" />
+    <Position X="4.75" Y="1.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Mur.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Labyrinth_fights.Objet">
-    <Position X="14.25" Y="2" Width="1.5" />
+  <Class Name="Labyrinth_fights.Objet" Collapsed="true">
+    <Position X="13" Y="1.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAIAAAACAAAAAAAAAAAAAA=</HashCode>
       <FileName>Objet.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Labyrinth_fights.ObjetFactory">
-    <Position X="4.5" Y="7" Width="1.5" />
+  <Class Name="Labyrinth_fights.ObjetFactory" Collapsed="true">
+    <Position X="9.5" Y="2.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>ObjetFactory.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Labyrinth_fights.OtherCase">
-    <Position X="0.5" Y="2.5" Width="1.5" />
+    <Position X="0.5" Y="1.75" Width="3.5" />
     <TypeIdentifier>
       <HashCode>AAACAAAAAgAAAAAgAAAAIAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>OtherCase.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Labyrinth_fights.Program" Collapsed="true">
-    <Position X="14.5" Y="0.75" Width="1.5" />
+    <Position X="11.25" Y="2.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAA=</HashCode>
       <FileName>Program.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Labyrinth_fights.Sortie">
-    <Position X="5" Y="1.75" Width="1.5" />
+  <Class Name="Labyrinth_fights.Sortie" Collapsed="true">
+    <Position X="7" Y="1.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Sortie.cs</FileName>

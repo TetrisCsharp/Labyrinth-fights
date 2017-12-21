@@ -10,13 +10,14 @@ namespace Labyrinth_fights
     {
         private ObjetFactory objetFactory;
         private CombattantFactory combattantFactory;
+        private Labyrinthe labyrinthe;
 
         public CaseFactory()
         {
             objetFactory = new ObjetFactory();
             combattantFactory = new CombattantFactory();
         }
-        public Case returnCase(string type,int x ,int y)
+        public Case returnCase(string type,int x ,int y,Labyrinthe labyrinthe)
         {
             if (type is "mur")
             {
@@ -34,7 +35,7 @@ namespace Labyrinth_fights
             {
                 return new OtherCase(false, "$", objetFactory.renvoieObjet());
             }
-            else return new OtherCase(false, "O", combattantFactory.returnCombattant(x,y));
+            else return new OtherCase(false, "O", combattantFactory.returnCombattant(x,y,labyrinthe));
         }
     }
     

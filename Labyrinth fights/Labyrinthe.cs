@@ -18,7 +18,7 @@ namespace Labyrinth_fights
         private CaseFactory caseFactory;
         private CombattantFactory combattantFactory;
 
-        private List<string> actionList;
+        private Stack<int []> actionList;
 
         public Labyrinthe()
         {
@@ -63,7 +63,7 @@ namespace Labyrinth_fights
             RemplissageBoard();
             //AffichageBoardTemp();
             //displayBoard();
-            actionList = new List<string>();
+            actionList = new Stack<int []>();
         }
 
         //display the temp board (only used for the test)
@@ -79,7 +79,7 @@ namespace Labyrinth_fights
             }
         }
         // display the board in the console
-        public void displayBoard()
+        public void displayBoard(int delais,bool activeStack)
         {
             while (true)
             {
@@ -100,7 +100,23 @@ namespace Labyrinth_fights
                         }
                     }
                 }
-                Thread.Sleep(200); 
+
+
+                if (activeStack)
+                {
+
+                    foreach (int[] item in actionList)
+                    {
+                        Console.Write(item[0] + " " + item[1]);
+                        Console.Write(" || ");
+                    }
+
+                    Console.Write("\n");
+                    Console.WriteLine(actionList.Count);
+                }
+
+
+                Thread.Sleep(delais); 
                 Console.SetCursorPosition(0, 0);
             }
         }
@@ -116,13 +132,13 @@ namespace Labyrinth_fights
                     switch (temp[i, j])
                     {
                         case "0":
-                            board[i, j] = caseFactory.returnCase("libre",dimX,dimY);
+                            board[i, j] = caseFactory.returnCase("libre",dimX,dimY,this);
                             break;
                         case "1":
-                            board[i, j] = caseFactory.returnCase("mur",dimX,dimY);
+                            board[i, j] = caseFactory.returnCase("mur",dimX,dimY,this);
                             break;
                         case "2":
-                            board[i, j] = caseFactory.returnCase("sortie",dimX,dimY);
+                            board[i, j] = caseFactory.returnCase("sortie",dimX,dimY,this);
                             break;
                         default:
                             break;
@@ -146,6 +162,12 @@ namespace Labyrinth_fights
         {
             get { return this.board; }
             set { this.board = value; }
+        }
+
+        public Stack<int []> ActionList
+        {
+            get { return this.ActionList; }
+            set { this.actionList = value; }
         }
     }
 }

@@ -11,32 +11,33 @@ namespace Labyrinth_fights
         private int pointsDeVie;
         private int capacite;
         private Objet objet;
-        private bool caractere;
+        private bool offensif;
         private Object symbol;
         private bool[,] boardVisite;
         private Stack<int[]> stack;
         private ObjetFactory objetFactory;
 
-        public Combattant(bool caractere,int x, int y)
+        public Combattant(bool offensif,int x, int y,Labyrinthe lab)
         {
             boardVisite = new bool[x,y];
-            initBoardVisites(x,y);
+            initBoardVisites(x,y,lab);
             pointsDeVie = 100;
             capacite = 10;
-            this.caractere = caractere; //defensif
+            this.offensif = offensif; //defensif
             this.objetFactory = new ObjetFactory();
             objet = objetFactory.renvoieObjet();
             objet.Valeur = 0;
             stack = new Stack<int[]>();
         }
 
-        public void initBoardVisites(int x, int y)
+        public void initBoardVisites(int x, int y,Labyrinthe lab)
         {
             for (int i = 0; i < boardVisite.GetLength(0); i++)
             {
                 for(int j = 0; j < boardVisite.GetLength(1); j++)
                 {
-                    boardVisite[i, j] = false;
+                    if (lab.Board[i, j] is Mur) boardVisite[i, j] = true;
+                    else boardVisite[i, j] = false;
                 }
             }
         }
@@ -70,6 +71,12 @@ namespace Labyrinth_fights
         {
             get { return this.objet; }
             set { this.objet = value; }
+        }
+
+        public bool Offensif
+        {
+            get => offensif;
+            set => offensif = value;
         }
     }
 
